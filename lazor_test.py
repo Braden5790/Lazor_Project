@@ -1,3 +1,31 @@
+'''
+this will be the logic of how a lazor trail moves in a 2D grid
+There are block positions in the grid that are occupied by objects
+The lazor will move in a straight line until it hits a block
+The block will reflect the lazor in a certain direction
+The lazor will then continue in that direction until it hits another block or the target
+the lazor target and the lazor origin exist in a space between block positions
+
+lazors have two vectors, one for the x axis and one for the y axis
+the lazor vectors can only be 1 or -1
+if more x distance than y distance is covered before hitting a reflector, the x direction will reverse
+if more y distance than x distance is covered before hitting a reflector, the y direction will reverse
+
+0 = no block allowed
+1 = lazor position, no block allowed
+2 = blocks allowed
+3 = fixed reflecting block
+4 = fixed opaque block
+5 = fixed refracting block
+
+these blocks can occupy the 2 position:
+6 = movable reflecting block
+7 = movable opaque block
+8 = movable refracting block
+
+9 = lazor target, no block allowed
+'''
+
 rows = 8
 columns = 8
 grid = [[2 for x in range(columns)] for y in range(rows)]
@@ -105,3 +133,4 @@ def lazor_movement(start, direction, grid):
 
 if __name__ == '__main__':
     lazor_movement((2, 7), (1, -1), grid)
+    print(grid)
