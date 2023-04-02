@@ -24,6 +24,7 @@ these blocks can occupy the 2 position:
 8 = movable refracting block
 
 9 = lazor target, no block allowed
+10 = lazor origin, no block allowed
 '''
 
 rows = 8
