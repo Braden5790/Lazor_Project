@@ -16,6 +16,8 @@ grid[4][3] = 9
 grid[2][5] = 9
 grid[4][7] = 9
 
+
+
 # create a list of lazor targets
 targets = [(3, 0), (4, 3), (2, 5), (4, 7)]
 
