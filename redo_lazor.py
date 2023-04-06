@@ -11,55 +11,65 @@ the lazor vectors can only be 1 or -1
 if more x distance than y distance is covered before hitting a reflector, the x direction will reverse
 if more y distance than x distance is covered before hitting a reflector, the y direction will reverse
 
-0 = no block allowed
+0 = x = no block allowed
 1 = lazor position, no block allowed
-2 = blocks allowed
-3 = fixed reflecting block
-4 = fixed opaque block
-5 = fixed refracting block
+2 = o = blocks allowed
+3 = A = fixed reflecting block
+4 = B = fixed opaque block
+5 = C = fixed refracting block
 
 these blocks can occupy the 2 position:
-6 = movable reflecting block
-7 = movable opaque block
-8 = movable refracting block
+6 = a = movable reflecting block
+7 = b = movable opaque block
+8 = c = movable refracting block
 
 9 = lazor target, no block allowed
 10 = lazor origin, no block allowed
+
+Input:
+data = {'grid': grid, 'blocks': blocks, 'lazers': lazers, 'points': points}
+grid = nested lists
+blocks = dictionary
+lasers = nested tuples in list
+points = nested tuples in list
+
 '''
+from bff_reader import read_bff
 
-rows = 8
-columns = 8
-grid = [[2 for x in range(columns + 1)] for y in range(rows + 1)]
+data = read_bff('mad_1.bff')
+grid = data['grid']
 
-for i in range(rows + 1):
-    for j in range(columns + 1):
-        if i % 2 != 0:
-            grid[i][j] = 2 if j % 2 != 0 else 1
-        else:
-            grid[i][j] = 1
-
-# set the target position and lazor origin
-
-grid[3][0] = 9
-grid[4][3] = 9
-grid[2][5] = 9
-grid[4][7] = 9
-# grid[3][7] = 5
+# Convert grid to numbered syntax
+for y in range(len(grid)):
+    for x in range(len(grid[0])):
+        if grid[y][x] == 'o':
+            grid[y][x] = 2
+        elif grid[y][x] == ' ':
+            grid[y][x] = 1
+        elif grid[y][x] == 'x':
+            grid[y][x] = 0
+        elif grid[y][x] == 'A':
+            grid[y][x] = 3
+        elif grid[y][x] == 'B':
+            grid[y][x] = 4
+        elif grid[y][x] == 'C':
+            grid[y][x] = 5
 
 # create a list of lazor targets
-targets = [(3, 0), (4, 3), (2, 5), (4, 7)]
+targets = data['points']
 
 # add targets to grid denoting lazor targets with 9
 for target in targets:
     grid[target[0]][target[1]] = 9
 
-# create a function that will act as the lazor path
-# the function will check all squares in the path of the lazor
-
-
-# inputs = grid, lazor list (a list of Lazor objects)
-# outputs = lazor path in a list of positions
 def lazor_movement(grid, Lazor_list):
+    '''
+    This is a function that will act as the lazor path
+    the function will check all squares in the path of the lazor
+    
+    inputs = grid, lazor list (a list of Lazor objects)
+    outputs = lazor path in a list of positions
+    '''
     positions = []
     for lazor in Lazor_list:
         lp = lazor.position
@@ -151,7 +161,7 @@ class Lazor:
         x_vec = self.vector[0]
         self.vector = (-x_vec, self.vector[1])
         # generate new lazor with new position and vector
-    
+
     def refract_y(self):
         new_lazor = Lazor(self.position, self.vector)
         Lazor_list.append(new_lazor)
