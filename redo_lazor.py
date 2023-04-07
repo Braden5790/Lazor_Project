@@ -156,17 +156,16 @@ class Lazor:
         self.vector = (self.vector[0], -y_vec)
 
     def refract_x(self):
-        new_lazor = Lazor(self.position, self.vector)
-        Lazor_list.append(new_lazor)
         x_vec = self.vector[0]
-        self.vector = (-x_vec, self.vector[1])
-        # generate new lazor with new position and vector
+        new_pos = (self.position[0] - x_vec, self.position[1] + self.vector[1])
+        new_lazor = Lazor(new_pos, (-x_vec, self.vector[1]))
+        Lazor_list.append(new_lazor)
 
     def refract_y(self):
-        new_lazor = Lazor(self.position, self.vector)
+        y_vec = self.vector[1]
+        new_pos = (self.position[0] + self.vector[0], self.position[1] - y_vec)
+        new_lazor = Lazor(new_pos, (self.vector[0], - y_vec))
         Lazor_list.append(new_lazor)
-        x_vec = self.vector[0]
-        self.vector = (-x_vec, self.vector[1])
 
     def absorb(self):
         self.vector = (0, 0)
