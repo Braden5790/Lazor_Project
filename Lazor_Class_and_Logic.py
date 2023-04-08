@@ -35,6 +35,7 @@ points = nested tuples in list
 
 '''
 from bff_reader import read_bff
+import random
 
 data = read_bff('mad_1.bff')
 grid = data['grid']
@@ -138,7 +139,6 @@ def lazor_movement(grid, Lazor_list):
                 else:
                     positions.append(new_pos)
                     continue
-    print(positions)
     return positions
 
 # class to define lazor behaviour
@@ -170,6 +170,70 @@ class Lazor:
     def absorb(self):
         self.vector = (0, 0)
 
+
+# class to define block behaviour
+class Block:
+    def __init__(self, type):
+        self.type = type
+        self.position = None
+        
+    def place_on_grid(self, grid):
+        available_positions = []
+        for row_idx, row in enumerate(grid):
+            for col_idx, cell in enumerate(row):
+                if cell == 2:
+                    # Check that the cell is empty and that an 'a' block can only be placed on even columns
+                    available_positions.append((row_idx, col_idx))
+        if available_positions:
+            self.position = random.choice(available_positions)
+            grid[self.position[0]][self.position[1]] = self.type
+            if self.type == 'a':
+                grid[self.position[0]][self.position[1]] = 6
+            elif self.type == 'b':
+                grid[self.position[0]][self.position[1]] = 7
+            elif self.type == 'c':
+                grid[self.position[0]][self.position[1]] = 8
+            return True
+        else:
+            return False
+    
+    def __eq__(self, other):
+        return self.type == other.type
+    
+    def __repr__(self):
+        return f"Block(type={self.type}, position={self.position})"
+
+
+def solve_blocks(Block_list, grid, target_list):
+    '''
+    This function will place the blocks in the grid
+    '''
+
+    cache = []
+    true_list = [False]
+    
+    while all(true_list) == False:
+        # Cache the position of the block arrangement for all blocks
+        inner_cache = []
+        for block in Block_list:
+            block.place_on_grid(grid)
+            inner_cache.append(block.position)
+            print(block.position)
+        if inner_cache in cache:
+            continue
+        else:
+            cache.append(inner_cache)
+        positions = lazor_movement(grid, Lazor_list)
+        print(cache)
+        if all(elem in positions for elem in target_list) is True:
+            true_list = [True]
+            print(positions)
+            print(target_list)
+        else:
+            continue
+    print("you are so good")
+
+
 lazor_1 = [(2, 7), (1, -1)]
 lazor_2 = [(3, 2), (-1, -1)]
 
@@ -181,5 +245,15 @@ for lazor in lazor_list:
     lazor_obj = Lazor(lazor[0], lazor[1])
     Lazor_list.append(lazor_obj)
 
+block_list = ['a', 'a', 'c']
+Block_list = []
+for block in block_list:
+    block_obj = Block(block)
+    Block_list.append(block_obj)
+
+target_list = [(3, 0), (4, 3), (2, 5), (4, 7)]
+
 if __name__ == "__main__":
-    lazor_movement(grid, Lazor_list)
+    solve_blocks(Block_list, grid, target_list)
+    # lazor_movement(grid, Lazor_list)
+    # print(grid)
