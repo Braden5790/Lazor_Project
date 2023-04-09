@@ -30,11 +30,11 @@ these blocks can occupy the 2 position:
 import itertools
 
 grid = [[1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 2, 1, 2, 1, 8, 1, 2, 1],
+        [1, 2, 1, 2, 1, 2, 1, 2, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 2, 1, 2, 1, 2, 1, 3, 1],
+        [1, 2, 1, 2, 1, 2, 1, 2, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 3, 1, 2, 1, 2, 1, 2, 1],
+        [1, 2, 1, 2, 1, 2, 1, 2, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 2, 1, 2, 1, 2, 1, 2, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1]]
@@ -155,6 +155,9 @@ class Lazor:
 
     def absorb(self):
         self.vector = (0, 0)
+    
+    def copy(self):
+        return Lazor(self.position, self.vector)
 
 
 # class to define block behaviour
@@ -162,26 +165,6 @@ class Block:
     def __init__(self, type):
         self.type = type
         self.position = None
-        
-    def place_on_grid(self, grid):
-        available_positions = []
-        for row_idx, row in enumerate(grid):
-            for col_idx, cell in enumerate(row):
-                if cell == 2:
-                    # Check that the cell is empty and that an 'a' block can only be placed on even columns
-                    available_positions.append((row_idx, col_idx))
-        if available_positions:
-            self.position = random.choice(available_positions)
-            grid[self.position[0]][self.position[1]] = self.type
-            if self.type == 'a':
-                grid[self.position[0]][self.position[1]] = 6
-            elif self.type == 'b':
-                grid[self.position[0]][self.position[1]] = 7
-            elif self.type == 'c':
-                grid[self.position[0]][self.position[1]] = 8
-            return True
-        else:
-            return False
     
     def __repr__(self):
         return f"Block(type={self.type}, position={self.position})"
@@ -206,31 +189,39 @@ def block_positions(grid, block_list):
     return block_positions
 
 
-def solve_puzzle(grid, lazor_list, block_list, target_list):
-    # Generate all possible block positions
-    blk_pos = block_positions(grid, block_list)
-    # Iterate through all possible block positions
-    for positions in blk_pos:
-        # Make a copy of the original grid
-        new_grid = [row[:] for row in grid]
-        # Place the blocks on the new grid
-        for idx, block in enumerate(block_list):
-            block.position = positions[idx]
-            new_grid[block.position[0]][block.position[1]] = block.type
-            if block.type == 'a':
-                new_grid[block.position[0]][block.position[1]] = 6
-            elif block.type == 'b':
-                new_grid[block.position[0]][block.position[1]] = 7
-            elif block.type == 'c':
-                new_grid[block.position[0]][block.position[1]] = 8
-        # Check if the lazor path intersects with the target positions
-        lazor_positions = lazor_movement(new_grid, lazor_list)
-        if all(elem in lazor_positions for elem in target_list) is True:
-            print("Solution found!")
-            # print(lazor_positions)
-            return True
-    print("No solution found")
-    return False
+def solve_puzzle(grid, lazor_list, block_config, target_list, block_list):
+    # block_arr = block_list[0]
+    for block_posi, block in zip(block_config, block_list):
+        block.position = block_posi
+        grid[block.position[0]][block.position[1]] = block.type
+        if block.type == 'a':
+            grid[block.position[0]][block.position[1]] = 6
+        elif block.type == 'b':
+            grid[block.position[0]][block.position[1]] = 7
+        elif block.type == 'c':
+            grid[block.position[0]][block.position[1]] = 8
+
+    lazor_positions = lazor_movement(grid, lazor_list)
+    print(lazor_positions)
+    # Check if all target positions are hit
+    if all(elem in lazor_positions for elem in target_list) is True:
+        print("Solution found!")
+        print(lazor_positions)
+        print(grid)
+        return True
+    else:
+        # print("Solution not found!")
+        return False
+
+def solver(grid, lazor_list, block_list, target_list):
+    block_pos = block_positions(grid, block_list)
+    for block_config in block_pos:
+        fu = solve_puzzle(grid, lazor_list, block_config, target_list, block_list)
+        if fu == True:
+            return block_config
+        else:
+            block_pos.pop(0)
+            continue
 
 
 lazor_1 = [(2, 7), (1, -1)]
@@ -262,7 +253,5 @@ for target in raw_target_list:
     target_list.append(new_target)
 
 if __name__ == "__main__":
-    solve_puzzle(grid, Lazor_list, Block_list, target_list)
-    print(block_positions(grid, Block_list))
-    print(lazor_movement(grid, Lazor_list))
-
+    solver(grid, Lazor_list, Block_list, target_list)
+    # print(block_positions(grid, Block_list))
