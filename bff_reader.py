@@ -43,12 +43,25 @@ def read_bff(file_name):
 
             # Split the line to analyze the first letter
             parts = line.strip().split()
+            # print(parts)
             if parts[0] == 'A':
-                blocks['a'].append(int(parts[1]))
+                try:
+                    if isinstance(int(parts[1]), int):
+                        blocks['a'].append(int(parts[1]))
+                except ValueError:
+                    grid.append(list(line))
             elif parts[0] == 'B':
-                blocks['b'].append(int(parts[1]))
+                try:
+                    if isinstance(int(parts[1]), int):
+                        blocks['b'].append(int(parts[1]))
+                except ValueError:
+                    grid.append(list(line))
             elif parts[0] == 'C':
-                blocks['c'].append(int(parts[1]))
+                try:
+                    if isinstance(int(parts[1]), int):
+                        blocks['c'].append(int(parts[1]))
+                except ValueError:
+                    grid.append(list(line))
             elif parts[0] == 'L':
                 lazers.append((int(parts[1]), int(parts[2]),
                                int(parts[3]), int(parts[4])))

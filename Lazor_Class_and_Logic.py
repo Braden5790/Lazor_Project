@@ -35,6 +35,7 @@ points = nested tuples in list
 
 '''
 import itertools
+from sympy.utilities.iterables import multiset_permutations
 import copy
 from bff_reader import read_bff
 from lazor_output import visual_board
@@ -51,51 +52,59 @@ def lazor_movement(grid, lazor_objs):
     positions = []
     new_lazors = []
     for lazor in lazor_objs:
+        current_positions = []
         start = lazor.position
-        positions.append(start)
+        current_positions.append(start)
         new_pos = start
+        # print(lazor.vector)
         # go through the loop to create a list of lazor positions for each lazor
-        while len(positions) > 0 and len(positions) < 500:
+        while len(current_positions) > 0 and len(current_positions) < 500:
             # check positions in the lazor path in which the lazor will encounter a block
             x_check = (new_pos[0] + lazor.vector[0], new_pos[1])
             y_check = (new_pos[0], new_pos[1] + lazor.vector[1])
-            if x_check[0] < 0 or x_check[0] >= len(grid) or x_check[1] < 0 or x_check[1] >= len(grid):
+            if x_check[0] < 0 or x_check[0] >= len(grid[0]) or x_check[1] < 0 or x_check[1] >= len(grid[0]):
                 break
-            elif y_check[0] < 0 or y_check[0] >= len(grid) or y_check[1] < 0 or y_check[1] >= len(grid):
+            elif y_check[0] < 0 or y_check[0] >= len(grid[0]) or y_check[1] < 0 or y_check[1] >= len(grid[0]):
                 break
             x_blk = grid[x_check[1]][x_check[0]]
-            print(x_blk)
+            # print(x_blk)
             y_blk = grid[y_check[1]][y_check[0]]
-            print(y_blk)
+            # print(y_blk)
             # print(positions)
             # check to see if the lazor encounters a reflecting block
             if x_blk == 3 or x_blk == 6:
                 lazor.reflect_x()
+                # print(new_pos)
                 new_pos = (new_pos[0] + lazor.vector[0], new_pos[1] + lazor.vector[1])
-                positions.append(new_pos)
+                current_positions.append(new_pos)
                 # lazor.set_position(new_pos)
-                print(new_pos)
-                print("x-reflect!")
+                # print(new_pos)
+                # print("x-reflect!")
                 continue
             elif y_blk == 3 or y_blk == 6:
                 new_lazor = lazor.reflect_y()
+                # print(new_pos)
                 new_pos = (new_pos[0] + lazor.vector[0], new_pos[1] + lazor.vector[1])
-                positions.append(new_pos)
+                current_positions.append(new_pos)
                 # lazor.set_position(new_pos)
-                print(new_pos)
-                print("y-reflect!")
+                # print(new_pos)
+                # print("y-reflect!")
                 continue
             # check to see if the lazor encounters an opaque block
             elif x_blk == 4 or x_blk == 7:
                 # in the x_check position, the lazor's last position is the x_check position
-                lazor.absorb()
+                # x = lazor.absorb(new_pos)
+                # new_lazors.append(x)
+                current_positions.append(new_pos)
                 # new_pos = x_check
                 # positions.append(new_pos)
                 # break loop since lazor is absorbed
                 break
             elif y_blk == 4 or y_blk == 7:
                 # in the y_check position, the lazor's last position is the y_check position
-                lazor.absorb()
+                # y = lazor.absorb(new_pos)
+                # new_lazors.append(y)
+                current_positions.append(new_pos)
                 # new_pos = y_check
                 # positions.append(new_pos)
                 # break loop since lazor is absorbed
@@ -104,23 +113,25 @@ def lazor_movement(grid, lazor_objs):
             elif x_blk == 5 or x_blk == 8:
                 # use lazor refract function to generate a new lazor
                 # new lazor will be appended to list of Lazor objects
-                new_lazor = lazor.refract_x()
+                new_lazor = lazor.refract_x(new_pos)
+                # print(new_pos)
                 new_pos = (new_pos[0] + lazor.vector[0], new_pos[1] + lazor.vector[1])
-                positions.append(new_pos)
+                current_positions.append(new_pos)
                 new_lazors.append(new_lazor)
                 # lazor.set_position(new_pos)
-                print(new_pos)
+                # print(new_pos)
                 print("x-fract!")
                 continue
             elif y_blk == 5 or y_blk == 8:
                 # use lazor refract function to generate a new lazor
                 # new lazor will be appended to list of Lazor objects
-                new_lazor = lazor.refract_y()
+                new_lazor = lazor.refract_y(new_pos)
+                # print(new_pos)
                 new_pos = (new_pos[0] + lazor.vector[0], new_pos[1] + lazor.vector[1])
-                positions.append(new_pos)
+                current_positions.append(new_pos)
                 new_lazors.append(new_lazor)
                 # lazor.set_position(new_pos)
-                print(new_pos)
+                # print(new_pos)
                 print("y-fract!")
                 continue
             # continue for all other cases
@@ -128,13 +139,18 @@ def lazor_movement(grid, lazor_objs):
             else:
                 new_pos = (new_pos[0] + lazor.vector[0], new_pos[1] + lazor.vector[1])
                 # new_pos = (new_pos[0] + 1, new_pos[1] + (-1)) THIS WORKS WHAT????
-                print(new_pos)
-                if new_pos[0] < 0 or new_pos[0] >= len(grid) or new_pos[1] < 0 or new_pos[1] >= len(grid):
+                # print(lazor.vector)
+                # print(new_pos)
+                if new_pos[0] < 0 or new_pos[0] >= len(grid[0]) or new_pos[1] < 0 or new_pos[1] >= len(grid[0]):
                     break
                 else:
-                    positions.append(new_pos)
+                    current_positions.append(new_pos)
                     continue
+        positions.append(current_positions)
+    ###########################################################################
     # print(positions)
+    # print(new_lazors)
+    # print('')
     return (positions,new_lazors)
 
 # class to define lazor behaviour
@@ -142,18 +158,13 @@ class Lazor:
     def __init__(self, position, vector):
         self.position = position
         self.vector = vector
-        # if vector[0] < 0:
-        #     # Might need to change this to be only multiplying the y by -1
-        #     self.vector = (vector[0] * -1, vector[1])
-        # elif vector[0] > 0:
-        #     self.vector = (vector[0] * -1, vector[1])
-        # if vector[1] < 0:
-        #     self.vector = (vector[0], vector[1] * -1)
-        # elif vector[1] > 0:
-        #     self.vector = (vector[0], vector[1] * -1)
+        self.og_vector = vector
 
     def set_position(self, position):
         self.position = position
+
+    def reset_vector(self):
+        self.vector = self.og_vector
 
     def reflect_x(self):
         x_vec = self.vector[0]
@@ -163,22 +174,24 @@ class Lazor:
         y_vec = self.vector[1]
         self.vector = (self.vector[0], -y_vec)
 
-    def refract_x(self):
+    def refract_x(self, new_pos):
         x_vec = self.vector[0]
-        new_pos = (self.position[0] - x_vec, self.position[1] + self.vector[1])
+        # new_pos = (self.position[0] - x_vec, self.position[1] + self.vector[1])
         new_lazor = Lazor(new_pos, (-x_vec, self.vector[1]))
         # lazor_objects.append(new_lazor)
         return new_lazor
 
-    def refract_y(self):
+    def refract_y(self, new_pos):
         y_vec = self.vector[1]
-        new_pos = (self.position[0] + self.vector[0], self.position[1] - y_vec)
+        # new_pos = (self.position[0] + self.vector[0], self.position[1] - y_vec) I Want to replace this line directly with the intersection point of the current lazor with the block
         new_lazor = Lazor(new_pos, (self.vector[0], - y_vec))
         # lazor_objects.append(new_lazor)
         return new_lazor
-
-    def absorb(self):
+    
+    def absorb(self,new_pos):
         self.vector = (0, 0)
+        new_lazor = Lazor(new_pos, self.vector)
+        return new_lazor
 
     def copy(self):
         return Lazor(self.position, self.vector)
@@ -214,6 +227,14 @@ def block_positions(grid, block_list):
     # print(block_positions)
     return block_positions
 
+def has_nested_lists(lst):
+    """
+    Returns True if the list `lst` contains nested lists, False otherwise.
+    """
+    for item in lst:
+        if isinstance(item, list):
+            return True
+    return False
 
 def solve_puzzle(grid, lazor_objs, block_config, target_list, block_objs):
     # block_arr = block_list[0]
@@ -234,31 +255,63 @@ def solve_puzzle(grid, lazor_objs, block_config, target_list, block_objs):
         elif block.type == 'c':
             new_grid[block.position[0]][block.position[1]] = 8
 
-        lazor_data = lazor_movement(new_grid, lazor_objs)
-        lazor_positions = lazor_data[0]
-        if len(lazor_data[1]) > 0:
-            refract_lazors = lazor_movement(new_grid, lazor_data[1])
-            for element in refract_lazors:
-                lazor_positions.append(element)
-        
-        # print(lazor_positions)
-     
-     
-        # Check if all target positions are hit
-        if all(elem in lazor_positions for elem in target_list) is True:
-            print("Solution found!")
-            print(lazor_positions)
-            print(new_grid)
-            return True
-        else:
-            # print("Solution not found!")
-            for block in block_objs:
-                block.clear()
-            
+    # print(grid)
+
+    lazor_data = lazor_movement(new_grid, lazor_objs)
+    lazor_positions = (lazor_data[0])
+    all_positions = []
+    new_lazors = lazor_data[1]
     
-    print(new_grid) 
-    print('')
-    print(' ') 
+    # print(lazor_positions)
+    # print(lazor_data)
+
+    if has_nested_lists(lazor_positions):
+        for eleme in lazor_positions:
+            for elem in eleme:
+                # print(elem)
+                all_positions.append(elem)
+    # else:
+    #     all_positions = lazor_data[0]
+    # print(all_positions)
+    if len(new_lazors) > 0:
+        refract_lazors = lazor_movement(new_grid, new_lazors)
+        # lazor_positions.append(refract_lazors)
+        for element in refract_lazors[0]:
+            if len(element) > 0:
+                lazor_positions.append(element)
+                for i in range(len(element)):
+                    all_positions.append(element[i])
+    for lazor in lazor_objs:
+        lazor.reset_vector()
+
+
+    # print(lazor_positions)
+    # print('')
+    # print(all_positions)
+    # print(target_list)
+    # print('')
+
+    ##############################################################################
+    # print(new_grid)
+    # print('')
+    # print(' ')
+
+    # Check if all target positions are hit ###########################################################################
+    if all(elem in all_positions for elem in target_list):
+        print("Solution found!")
+        print(lazor_positions)
+        print('')
+        print(all_positions)
+        print('')
+        print(new_grid)
+        return (True, lazor_positions, new_grid)
+    else:
+        # print("Solution not found!")
+        for block in block_objs:
+            block.clear()
+            # return False
+            #Testing>
+            return False
 
 def solver(filename):
     
@@ -331,16 +384,53 @@ def solver(filename):
     
     block_pos = block_positions(grid, block_objects)
     for block_config in block_pos:
-        solve = solve_puzzle(grid, lazor_objects, block_config, targets, block_objects)
-        if solve:
-            print(block_config)
-            return block_config
+        solved = solve_puzzle(grid, lazor_objects, block_config, targets, block_objects)
+        if solved:
+            # print(block_config)
+            lazor_positions = solved[1]
+            new_grid = solved[2]
+            solved_data = {}
+            # Convert grid to numbered syntax
+            for y in range(len(new_grid)):
+                for x in range(len(new_grid[0])):
+                    if new_grid[y][x] == 2:
+                        new_grid[y][x] = 'o'
+                    elif new_grid[y][x] == 1:
+                        new_grid[y][x] = ' '
+                    elif new_grid[y][x] == 0:
+                        new_grid[y][x] = 'x'
+                    elif new_grid[y][x] == 3:
+                        new_grid[y][x] = 'A'
+                    elif new_grid[y][x] == 4:
+                        new_grid[y][x] = 'B'
+                    elif new_grid[y][x] == 5:
+                        new_grid[y][x] = 'C'
+                    elif new_grid[y][x] == 6:
+                        new_grid[y][x] = 'a'
+                    elif new_grid[y][x] == 7:
+                        new_grid[y][x] = 'b'
+                    elif new_grid[y][x] == 8:
+                        new_grid[y][x] = 'c'
+            solved_data['grid'] = new_grid
+            solved_data['points'] = targets
+            solved_data['lazors'] = lazor_positions
+            solved_data['filename'] = filename
+            visual_board(solved_data)
+            break
         else:
             block_pos.pop(0)
             continue
 
 if __name__ == "__main__":
     
+    # solver('dark_1.bff')
     solver('mad_1.bff')
-    # lazor_movement(grid, lazor_objects)
+    # solver('mad_4.bff') # NO WORK taking long
+    # solver('mad_7.bff') # NO WORK taking long
+    # solver('numbered_6.bff') # NO WORK - recursion out of control
+    # solver('showstopper_4.bff')
+    # solver('tiny_5.bff')
+    # solver('yarn_5.bff') # NO WORK taking long
+    
+    # lazor_movement(grid, lazor_objects) 
     # print(grid)
