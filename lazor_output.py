@@ -3,14 +3,25 @@ Author: Braden Barlean
 
 This module serves as the output of the Lazor Project. It takes the
 laser data and displays it using tkinter. 
+
+The code includes 1 function:
+1. visual_board(data): This function takes in the solved board, presents it, and
+saves it as a pdf.
 '''
+# Import the necessary modules
 import tkinter as tk
 from PIL import ImageGrab
 
 def visual_board(data):
     '''
-    This function takes in the solved board, presents it, and
-    saves it as a pdf.
+    ***Parameters***
+        data: dictionary
+            A dictionary containing the grid, blocks, lazers, and points
+    ***Returns***
+        None
+    ***Description***
+        This function takes in the solved board, presents it, and
+        saves it as a pdf.
     '''
     chars = data['grid']
     points = data['points']

@@ -1,14 +1,25 @@
 '''
 Author: Braden Barlean
+
+This module serves as the output of the Lazor Project. It takes the
+laser data and displays it using tkinter.
+
+The code includes 1 function:
+1. read_bff(file_name): This function serves to open a .bff file and
+returns a dictionary of data from the file.
 '''
 def read_bff(file_name):
     '''
-    This function serves to open a .bff file provided with the
-    Lazor Project, collects the data from the file, and stores the
-    information in a dictionary. 
-    
-    Input: file_name
-    Output: data dictionary
+    ***Parameters***
+    file_name: string
+        The name of the .bff file to be read
+    ***Returns***
+        data: dictionary
+            A dictionary containing the grid, blocks, lazers, and points
+    ***Description***
+        This function serves to open a .bff file provided with the
+        Lazor Project, collects the data from the file, and stores the
+        information in a dictionary.
     '''
     with open(file_name, 'r') as f:
 
@@ -87,6 +98,3 @@ def read_bff(file_name):
         data = {'grid': grid, 'blocks': blocks, 'lazers': lazers,
                 'points': points}
     return data
-
-if __name__ == '__main__':
-    print(read_bff('mad_1.bff'))
