@@ -34,9 +34,9 @@ lasers = nested tuples in list
 points = nested tuples in list
 
 '''
-import itertools
-from sympy.utilities.iterables import multiset_permutations
 import copy
+import time
+import itertools
 from bff_reader import read_bff
 from lazor_output import visual_board
 
@@ -56,15 +56,24 @@ def lazor_movement(grid, lazor_objs):
         start = lazor.position
         current_positions.append(start)
         new_pos = start
+        # print(grid)
+        # print(len(grid))
+        # print(len(grid[0]))
         # print(lazor.vector)
         # go through the loop to create a list of lazor positions for each lazor
         while len(current_positions) > 0 and len(current_positions) < 500:
             # check positions in the lazor path in which the lazor will encounter a block
             x_check = (new_pos[0] + lazor.vector[0], new_pos[1])
+            # print(x_check)
+            # print(len(grid[0]))
             y_check = (new_pos[0], new_pos[1] + lazor.vector[1])
-            if x_check[0] < 0 or x_check[0] >= len(grid[0]) or x_check[1] < 0 or x_check[1] >= len(grid[0]):
+            # print(y_check)
+            
+            if x_check[0] < 0 or x_check[0] >= len(grid[0]) or x_check[1] < 0 or x_check[1] >= len(grid): #### Changed this: took = from len(grid[0]) parts
+                # print('badx')
                 break
-            elif y_check[0] < 0 or y_check[0] >= len(grid[0]) or y_check[1] < 0 or y_check[1] >= len(grid[0]):
+            elif y_check[0] < 0 or y_check[0] >= len(grid[0]) or y_check[1] < 0 or y_check[1] >= len(grid): #### Changed this: took = from len(grid[0]) parts
+                # print('bady')
                 break
             x_blk = grid[x_check[1]][x_check[0]]
             # print(x_blk)
@@ -120,7 +129,7 @@ def lazor_movement(grid, lazor_objs):
                 new_lazors.append(new_lazor)
                 # lazor.set_position(new_pos)
                 # print(new_pos)
-                print("x-fract!")
+                # print("x-fract!")
                 continue
             elif y_blk == 5 or y_blk == 8:
                 # use lazor refract function to generate a new lazor
@@ -132,13 +141,12 @@ def lazor_movement(grid, lazor_objs):
                 new_lazors.append(new_lazor)
                 # lazor.set_position(new_pos)
                 # print(new_pos)
-                print("y-fract!")
+                # print("y-fract!")
                 continue
             # continue for all other cases
             # break the loop when lazor reaches the end of the grid
             else:
                 new_pos = (new_pos[0] + lazor.vector[0], new_pos[1] + lazor.vector[1])
-                # new_pos = (new_pos[0] + 1, new_pos[1] + (-1)) THIS WORKS WHAT????
                 # print(lazor.vector)
                 # print(new_pos)
                 if new_pos[0] < 0 or new_pos[0] >= len(grid[0]) or new_pos[1] < 0 or new_pos[1] >= len(grid[0]):
@@ -208,7 +216,6 @@ class Block:
     def __repr__(self):
         return f"Block(type={self.type}, position={self.position})"
 
-
 # create a function to generate all possible block positions
 def block_positions(grid, block_list):
     available_positions = []
@@ -218,14 +225,28 @@ def block_positions(grid, block_list):
                 # Check that the cell is empty and add it to the list of available positions
                 available_positions.append((row_idx, col_idx))
     
-    # Generate all possible permutations of block positions
-    block_positions = []
-    for positions in itertools.permutations(available_positions, len(block_list)):
-        # Check if any two blocks occupy the same position
-        if len(set(positions)) == len(block_list):
-            block_positions.append(list(positions))
+    block_types = []
+    for block in block_list:
+        block_types.append(block.type)
+    if all(types ==block_types[0] for types in block_types):
+        # Generate all possible combinations of block positions
+        block_positions = []
+        for positions in itertools.combinations(available_positions, len(block_list)):
+            # Check if any two blocks occupy the same position
+            if len(set(positions)) == len(block_list):
+                block_positions.append(list(positions))
+    else:
+        # Generate all possible permutations of block positions
+        block_positions = []
+        for positions in itertools.permutations(available_positions, len(block_list)):
+            # Check if any two blocks occupy the same position
+            if len(set(positions)) == len(block_list):
+                block_positions.append(list(positions))
+
     # print(block_positions)
     return block_positions
+
+
 
 def has_nested_lists(lst):
     """
@@ -255,7 +276,8 @@ def solve_puzzle(grid, lazor_objs, block_config, target_list, block_objs):
         elif block.type == 'c':
             new_grid[block.position[0]][block.position[1]] = 8
 
-    # print(grid)
+    # print(new_grid)
+    # return
 
     lazor_data = lazor_movement(new_grid, lazor_objs)
     lazor_positions = (lazor_data[0])
@@ -298,12 +320,12 @@ def solve_puzzle(grid, lazor_objs, block_config, target_list, block_objs):
 
     # Check if all target positions are hit ###########################################################################
     if all(elem in all_positions for elem in target_list):
-        print("Solution found!")
-        print(lazor_positions)
-        print('')
-        print(all_positions)
-        print('')
-        print(new_grid)
+        # print("Solution found!")
+        # print(lazor_positions)
+        # print('')
+        # print(all_positions)
+        # print('')
+        # print(new_grid)
         return (True, lazor_positions, new_grid)
     else:
         # print("Solution not found!")
@@ -357,7 +379,7 @@ def solver(filename):
     for block in block_list:
         block_obj = Block(block)
         block_objects.append(block_obj)
-
+    # print(block_objects)
     # Accesses the lazor data
     lazors = data['lazers']
     lazor_list = []
@@ -379,13 +401,14 @@ def solver(filename):
 
     # grid[7][2] = 9
     # print(grid)
-    
+    # print(data)
     # return
     
     block_pos = block_positions(grid, block_objects)
     for block_config in block_pos:
         solved = solve_puzzle(grid, lazor_objects, block_config, targets, block_objects)
         if solved:
+            # print('')
             # print(block_config)
             lazor_positions = solved[1]
             new_grid = solved[2]
@@ -423,14 +446,16 @@ def solver(filename):
 
 if __name__ == "__main__":
     
-    # solver('dark_1.bff')
+    startTime = time.time()
+    solver('dark_1.bff')
     solver('mad_1.bff')
-    # solver('mad_4.bff') # NO WORK taking long
-    # solver('mad_7.bff') # NO WORK taking long
-    # solver('numbered_6.bff') # NO WORK - recursion out of control
-    # solver('showstopper_4.bff')
-    # solver('tiny_5.bff')
-    # solver('yarn_5.bff') # NO WORK taking long
-    
-    # lazor_movement(grid, lazor_objects) 
+    solver('mad_4.bff') # NO WORK taking long
+    solver('mad_7.bff') # NO WORK taking long
+    solver('numbered_6.bff') # NO WORK - recursion out of control
+    solver('showstopper_4.bff')
+    solver('tiny_5.bff')
+    solver('yarn_5.bff') # NO WORK taking long
+    executionTime = (time.time() - startTime)
+    print('Execution time in seconds: ' + str((executionTime)))
+    # lazor_movement(grid, lazor_objects)
     # print(grid)

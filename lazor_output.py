@@ -6,7 +6,6 @@ laser data and displays it using tkinter.
 '''
 import tkinter as tk
 from PIL import ImageGrab
-from bff_reader import read_bff
 
 def visual_board(data):
     '''
@@ -25,13 +24,13 @@ def visual_board(data):
     # Create a frame for the grid
     frame = tk.Frame(root, bd=5, bg='white')
     frame.grid(row=0, column=0)
-
-    # Create a canvas for the grid
-    canvas = tk.Canvas(frame, width=500, height=500, bg='white')
-    canvas.grid(row=0, column=0)
-
+    
     # Define the size of each square in the grid
     square_size = 25
+
+    # Create a canvas for the grid
+    canvas = tk.Canvas(frame, width=(len(chars[0])*square_size), height=(len(chars)*square_size), bg='white')
+    canvas.grid(row=0, column=0)
 
     # Draw the grid of characters
     for row, char_row in enumerate(chars):
@@ -58,9 +57,6 @@ def visual_board(data):
 
     # Draw a red line
     for lazor in lazers:
-        # print('\nstart')
-        # print(lazor)
-        # print("")
         for i in range(len(lazor)):
             try:
                 start_x, start_y = (lazor[i][0]+1) * square_size, (lazor[i][1]+1) * square_size
@@ -92,16 +88,13 @@ def visual_board(data):
 
     # Save canvas as image
     canvas.update()
-    img = ImageGrab.grab(bbox=(canvas.winfo_rootx(), 
-                               canvas.winfo_rooty(), 
-                               canvas.winfo_rootx() 
-                               + canvas.winfo_width(), 
-                               canvas.winfo_rooty() 
+    img = ImageGrab.grab(bbox=(canvas.winfo_rootx(),
+                               canvas.winfo_rooty(),
+                               canvas.winfo_rootx()
+                               + canvas.winfo_width(),
+                               canvas.winfo_rooty()
                                + canvas.winfo_height()))
+    cleanname = filename[:-4]
+    img.save(cleanname + "_output.png")
 
-    img.save(filename + "_output.png")
-
-    root.mainloop()
-
-# if __name__ == '__main__':
-#     # visual_board()
+    root.destroy()
