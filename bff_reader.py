@@ -41,9 +41,8 @@ def read_bff(file_name):
             # the line
             line = line.replace('   ', ' ')
 
-            # Split the line to analyze the first letter
+            # Split the line to analyze the first letter to store
             parts = line.strip().split()
-            # print(parts)
             if parts[0] == 'A':
                 try:
                     if isinstance(int(parts[1]), int):
@@ -84,6 +83,7 @@ def read_bff(file_name):
         # Add a row of spaces at the end of the grid
         grid.append(empty_row)
 
+        # Generate data dictionary for all collected data from the bff
         data = {'grid': grid, 'blocks': blocks, 'lazers': lazers,
                 'points': points}
     return data
