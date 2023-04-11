@@ -15,3 +15,5 @@ Instructions for use:
 * Running the Lazor_Class_and_Logic.py file will display the images from each level and save outputs to .png files with the level name
     * You can comment out specific levels if you wish only specific levels to run
     * Running this file will call on modules in the folder
+
+Note: Running this code for the first time may result in inaccurate image outputs of each level. This is because the user will need to allow the terminal to record the screen to capture the output of the code. 
